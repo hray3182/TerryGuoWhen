@@ -30,6 +30,6 @@ class db:
     @classmethod
     def create_table(cls):
         cls.execute("CREATE TABLE IF NOT EXISTS User (username TEXT PRIMARY KEY NOT NULL, create_time DATETIME NOT NULL, token TEXT NOT NULL, balance INTEGER NOT NULL)", ())
-        cls.execute("CREATE TABLE IF NOT EXISTS Game (id TEXT PRIMARY KEY NOT NULL, nums TEXT NOT NULL, create_time TEXT NOT NULL)", ())
+        cls.execute("CREATE TABLE IF NOT EXISTS Game (id TEXT PRIMARY KEY NOT NULL, create_time TEXT NOT NULL, nums TEXT NOT NULL)", ())
         cls.execute("CREATE TABLE IF NOT EXISTS Bet (id TEXT PRIMARY KEY NOT NULL, create_time TEXT NOT NULL, game_id TEXT NOT NULL, username TEXT NOT NULL, bet_nums TEXT NOT NULL, amount INTEGER NOT NULL)", ())
         print("Database initialized")
