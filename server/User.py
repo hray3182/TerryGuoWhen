@@ -32,17 +32,6 @@ class User:
         token = hashlib.sha256(data.encode('utf-8')).hexdigest()
         self.token = token
 
-    def verify(self) -> bool:
-        """
-        驗證 token 是否正確
-        """
-        user = self.get_user_by_name(self.username)
-        if user is None:
-            # create new user
-            self.save_to_db()
-            return True
-
-        return user.token == self.token
 
     def save_to_db(self) -> str:
         """
@@ -73,6 +62,16 @@ class User:
             return user
         return None
 
+class LoginInfo:
+    def __init__(self, username, token) -> None:
+        self.username = username
+        self.token = token
+
+    def get_user(self) -> User:
+        u = User.get_user_by_name(self.username)
+        if u is not None and u.token == self.token:
+            return u
+
 
 if __name__ == "__main__":
     # 測試 User 類別
@@ -88,11 +87,6 @@ if __name__ == "__main__":
     except Exception as e:
         print(e)
 
-    # 拿剛剛新增的 user 測試登入
-    print(f"登入結果: {user.verify()}")
-
-    # 拿已存在的 user 測試登入
-    print(f"登入結果: {user.get_user_by_name(input).verify()}")
 
     user = User.get_user_by_name("糖心蛋")
     print(user)
