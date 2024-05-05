@@ -1,5 +1,4 @@
 from User import User
-from Game import Game
 import uuid
 from datetime import datetime
 from database import database
@@ -38,12 +37,16 @@ class Bet:
             result = e
         print(result)
         return result
+    
+class BetRequest:
+    def __init__(self, num: list[int], bet_amount: int) -> None:
+        self.num = num
+        self.bet_amount = bet_amount
 
-
-if __name__ == "__main__":
-    user = User("test")
-    game = Game("123")
-    bet = Bet(game.id, user, 100, [1, 2, 3])
-    database.db.create_table()
-    print(bet)
-    bet.save_to_db()
+# if __name__ == "__main__":
+#     user = User("test")
+#     game = Game("123")
+#     bet = Bet(game.id, user, 100, [1, 2, 3])
+#     database.db.create_table()
+#     print(bet)
+#     bet.save_to_db()
