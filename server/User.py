@@ -32,6 +32,14 @@ class User:
         token = hashlib.sha256(data.encode('utf-8')).hexdigest()
         self.token = token
 
+    def json(self):
+        return {
+            "username": self.username,
+            "create_time": self.create_time.strftime("%Y-%m-%d %H:%M:%S"),
+            "token": self.token,
+            "balance": self.balance
+        }
+
 
     def save_to_db(self) -> str:
         """
