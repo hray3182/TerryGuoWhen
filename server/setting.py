@@ -4,3 +4,5 @@ BEETING_ODDS = {
     1: 1,
     0: 0
 }
+
+SERVER_PORT = 8888
