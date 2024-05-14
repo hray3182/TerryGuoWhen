@@ -4,6 +4,7 @@ from database import database
 import json
 import User
 import Bet
+import utils
 
 class Game:
     def __init__(self, id: str, create_time=datetime.datetime.now()) -> None:
@@ -17,6 +18,7 @@ class Game:
 
     def __generate_nums(self):
         self.nums = (random.sample(range(1, 11), 3))
+        self.nums.sort()
 
     def save_to_db(self) -> str:
         try:
@@ -32,10 +34,8 @@ class Game:
         today = datetime.datetime.now().date().strftime("%Y-%m-%d")
         count = 0
         try:
-            # result = database.db.execute("SELECT COUNT(*) FROM Game WHERE create_time LIKE ?", (f"{today}%",))
             result = database.db.execute("SELECT COUNT(*) FROM Game WHERE DATE(create_time) = ?", (today,))
             count = int(result[0][0])
-            # result = result.fetchone()[0]
         except Exception as e:
             result = e
             return result
@@ -60,18 +60,14 @@ class GameManager():
 
     
     def json(self):
-        def handler(o):
-            if isinstance(o, datetime.datetime):
-                return o.isoformat()
-            else: 
-                return o.__dict__
-        return json.dumps(self, default=handler)
+        return json.dumps(self, default=utils.object_to_json_handler)
 
     def create_next_game(self):
         today = datetime.datetime.now().date().strftime("%Y-%m-%d")
         todays_count = Game.get_num_of_todays_game()
-        self.current_game = Game(f"{today}-{todays_count + 1}")
-        self.stop_bet_time = self.current_game.create_time + datetime.timedelta(seconds=2) # 先用 2 秒測試
+        self.current_game = Game(f"{today}-{todays_count + 1}", datetime.datetime.now())
+        self.current_game.save_to_db()
+        self.stop_bet_time = self.current_game.create_time + datetime.timedelta(seconds=2) 
         
     def message_for_client(self):
         # json format
