@@ -8,6 +8,7 @@ import json
 import hashlib
 import User
 import controller
+import utils
 
 gameManager = Game.GameManager()
 
@@ -17,7 +18,14 @@ class WsRequest:
         self.data = data
         self.username = username
 
-
+class WsResponse:
+    def __init__(self, action, data) -> None:
+        self.type = action
+        self.data = data
+    
+    def json(self):
+        return json.dumps(self, default=utils.object_to_json_handler)
+    
 class GameWebSocketHandler(tornado.websocket.WebSocketHandler):
     clients = {}
 
@@ -51,8 +59,12 @@ class GameWebSocketHandler(tornado.websocket.WebSocketHandler):
                 self.write_message("你想幹嘛？？？")
                 return
             self.write_message("成功下注")
+
+
         elif action == "get_game":
             self.write_message(gameManager.message_for_client())
+
+
         elif action == "login":
             username = data.data.get("username")
             token = data.data.get("token")
@@ -61,6 +73,7 @@ class GameWebSocketHandler(tornado.websocket.WebSocketHandler):
             if user is not None:
                 self.clients[self]["is_verify"] = True
                 self.write_message("登入成功")
+                self.write_message(user.json())
             else:
                 self.write_message("登入失敗")
     
@@ -86,6 +99,7 @@ async def handleGame():
         await asyncio.sleep(1)
         if gameManager.stop_bet_time < datetime.datetime.now():
             # create next game
+            print("開始新遊戲")
             gameManager.create_next_game()
         # print("Current game: ", gameManager.current_game)
         # print("Stop bet time: ", gameManager.stop_bet_time)
