@@ -1,11 +1,10 @@
 'use client'
 import { useState, useEffect, useRef } from 'react';
 import { User } from './module/user';
-import useWebSocket, { ReadyState, SendMessage } from 'react-use-websocket';
-import { Game, GameResult } from './module/game';
+import useWebSocket, { SendMessage } from 'react-use-websocket';
+import { Game} from './module/game';
 // global.css
 import './globals.css';
-import { json } from 'stream/consumers';
 const socketUrl = 'ws://localhost:8888/ws';
 
 interface Response {
@@ -115,12 +114,14 @@ export default function Home() {
     if (lastMessage !== null) {
       const response: Response = JSON.parse(lastMessage.data);
       if (response.action === 'login' && response.status === 'success') {
+        // @ts-ignore
         setUser(response.data);
         setLogined(true);
       }
       if (response.action === 'register') {
         if (response.status === 'success') {
           console.log(response.data)
+          // @ts-ignore
           setUser(response.data);
           // save to local storage
           localStorage.setItem('user', JSON.stringify(response.data));
@@ -136,16 +137,20 @@ export default function Home() {
         }
       }
       if (response.action === 'update_user') {
+        // @ts-ignore
         setUser(response.data);
       }
       if (response.action === 'user_update') {
+        // @ts-ignore
         setUser(response.data);
       }
       if (response.action === 'game_update') {
         // if change game, empty current bettings
+        // @ts-ignore
         if (currentGame && currentGame.game_id !== response.data.game_id) {
           setCurrentBettings([]);
         }
+        // @ts-ignore
         setCurrentGame(response.data);
       }
       if (response.action === 'bet') {
@@ -153,31 +158,36 @@ export default function Home() {
           setBettingResult({ state: 'fail', msg: response.data });
         } else {
           setBettingResult({ state: 'success', msg: "下注成功" });
+          // @ts-ignore
           setCurrentBettings([...currentBettings, { nums: response.data.bet_nums, amount: response.data.amount }])
           console.log(currentBettings)
         }
       }
       if (response.action === 'earn_info') {
         setEarnInfos([...earnInfos, {
+          // @ts-ignore
           game_id: response.data.game_id,
+          // @ts-ignore
           game_nums: "["+response.data.game_nums.join(', ')+ "]",
+          // @ts-ignore
           user_nums: "["+response.data.user_nums.join(', ')+"]",
+          // @ts-ignore
           bet_amount: response.data.bet_amount,
+          // @ts-ignore
           earn_amount: response.data.earn_amount
         }]);
       }
 
-      if (!response.status === 'game_update') {
-        console.log('received message:', response);
-      }
-
       if (response.action === 'get_earn_records' && response.status === 'success') {
+        // @ts-ignore
         setEarnInfos(response.data);
       }
       if (response.action === 'get_top' && response.status === 'success') {
+        // @ts-ignore
         setTopUsers(response.data);
       }
       if (response.action === 'game_history' && response.status === 'success') {
+        // @ts-ignore
         setGameHistory(response.data);
       }
     }
@@ -195,7 +205,7 @@ export default function Home() {
   return (
     <>
       {!logined && <RegisterUi sendMessage={sendMessage} result={registerMsg} />}
-      <div className="w-full flex space-x-3 bg-slate-950 h-screen">
+      {logined && <div className="w-full flex space-x-3 bg-slate-950 h-screen">
 
         <div className="w-1/3 h-screen">
           {(logined && user) && <UserInfoView user={user} />}
@@ -211,7 +221,7 @@ export default function Home() {
           {(logined && gameHistory) && <GameHistoryView gameHistory={gameHistory} />}
         </div>
 
-      </div>
+      </div>}
     </>
   );
 }
